@@ -1,41 +1,56 @@
+/**
+ * Settings popup controller for the YouTube Gemini Summarizer extension
+ */
+
 document.addEventListener("DOMContentLoaded", () => {
+  // DOM references
   const saveButton = document.getElementById("saveButton");
   const apiKeyInput = document.getElementById("apiKeyInput");
   const customInput = document.getElementById("customInstructionInput");
   const message = document.getElementById("message");
   const cancelButton = document.getElementById("cancel");
 
-  // Load existing values if available
+  // Track originally-loaded values to detect real changes (including clearing).
+  let originalApiKey = "";
+  let originalCustom = "";
+
+  // Load stored settings and populate inputs.
   chrome.storage.local.get(["apiKey", "customInstruction"], (result) => {
-    if (result.apiKey) apiKeyInput.value = result.apiKey;
-    if (result.customInstruction) customInput.value = result.customInstruction;
+    originalApiKey = result.apiKey ?? "";
+    originalCustom = result.customInstruction ?? "";
+
+    apiKeyInput.value = originalApiKey;
+    customInput.value = originalCustom;
   });
 
+  // Save handler
   saveButton.addEventListener("click", () => {
     const apiKey = apiKeyInput.value.trim();
     const custom = customInput.value.trim();
     const toSave = {};
 
-    if (apiKey) toSave.apiKey = apiKey;
-    if (custom) toSave.customInstruction = custom;
-
-    if (Object.keys(toSave).length === 0) {
+    // No-op detection: if nothing changed, surface a message and return.
+    if (apiKey === originalApiKey && custom === originalCustom) {
       message.textContent = "Nothing to save.";
       message.className = "error";
       message.style.display = "block";
       return;
     }
 
+    // Persist only changed keys. Include empty strings to allow clearing values.
+    if (apiKey !== originalApiKey) toSave.apiKey = apiKey;
+    if (custom !== originalCustom) toSave.customInstruction = custom;
+
     chrome.storage.local.set(toSave, () => {
       message.textContent = "Settings saved!";
       message.className = "success";
       message.style.display = "block";
-      // close popup shortly after saving for convenience
+      // Close popup shortly after saving for convenience.
       setTimeout(() => window.close(), 800);
     });
   });
 
-  // Close the popup when Cancel is clicked
+  // Cancel closes the popup without saving.
   cancelButton.addEventListener("click", () => {
     window.close();
   });
