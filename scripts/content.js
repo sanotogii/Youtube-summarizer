@@ -50,9 +50,18 @@ async function handleSummarize(btn) {
   btn.style.cursor = "not-allowed";
 
   try {
-    const apiKey = await new Promise((resolve) =>
-      chrome.storage.local.get("apiKey", (result) => resolve(result.apiKey)),
+    const result = await new Promise((resolve) =>
+      chrome.storage.local.get(["apiKey", "customInstruction"], (r) =>
+        resolve(r),
+      ),
     );
+    const apiKey = result.apiKey;
+    const customInstruction = (result.customInstruction ?? "").trim();
+
+    const prompt =
+      customInstruction.length > 0
+        ? customInstruction
+        : "Summarize this video in clear bullet points with headers if applicable. ";
 
     if (!apiKey) {
       showSummary("Please save your API Key first.", true);
@@ -76,7 +85,7 @@ async function handleSummarize(btn) {
                   },
                 },
                 {
-                  text: "Summarize this video in clear bullet points with headers if applicable.",
+                  text: prompt,
                 },
               ],
             },
