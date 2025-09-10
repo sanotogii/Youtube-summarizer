@@ -194,6 +194,27 @@ function getLoadingHTML() {
   </svg>Generating...`;
 }
 
+// Extension context validation
+function isExtensionContextValid() {
+  try {
+    return !!(chrome && chrome.runtime && chrome.runtime.id);
+  } catch (e) {
+    return false;
+  }
+}
+
+// Monitor URL changes
+let lastUrl = location.href;
+new MutationObserver(() => {
+  const url = location.href;
+  if (url !== lastUrl) {
+    lastUrl = url;
+    // Remove existing summary when URL changes
+    const existing = document.getElementById(CONFIG.summaryId);
+    if (existing) existing.remove();
+  }
+}).observe(document, { subtree: true, childList: true });
+
 // Initialize
 const observer = new MutationObserver(addGeminiButton);
 observer.observe(document.body, { childList: true, subtree: true });
