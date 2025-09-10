@@ -6,10 +6,36 @@
         <link rel="stylesheet" href="hello.css" />
     </head>
     <body>
-        <h1>Paste your API key</h1>
-        <input type="text" id="apiKeyInput" placeholder="Enter API Key here" />
-        <button id="saveButton">Save API Key</button>
-        <p id="message"></p>
+        <h1 id="settings">Youtube summarizer Settings</h1>
+
+        <!------------------------------------------------------------>
+        <h2>Paste your API key</h2>
+        <input
+            type="password"
+            id="apiKeyInput"
+            placeholder="Enter API Key here"
+        />
+        <p>
+            get your free api key from:
+            <a href="https://aistudio.google.com/apikey" target="_blank"
+                >Google ai studio</a
+            >
+        </p>
+
+        <!------------------------------------------------------------>
+
+        <h2>Add a custom instruction</h2>
+        <textarea
+            id="customInstructionInput"
+            placeholder="Enter custom instruction here"
+        ></textarea>
+
+        <div>
+            <button id="saveButton">Save Settings</button>
+            <button id="cancel">Cancel</button>
+        </div>
+
+        <div id="message"></div>
 
         <!-- Load external script -->
         <script src="hello.js"></script>
